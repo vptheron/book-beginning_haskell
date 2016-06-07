@@ -1,3 +1,5 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module DataTypes where
 
 data Person = Person String String Gender
@@ -26,24 +28,24 @@ data FutureTravel = CanFutureTravel | CannotFutureTravel
 
 data Price = Price Double deriving Show
 
-data TimeMachine = TimeMachine
-                     Manufacturer
-                     Model
-                     Name
-                     PastTravel
-                     FutureTravel
-                     Price
+data TimeMachine = TimeMachine {
+                     manufacturer :: Manufacturer,
+                     model :: Model,
+                     name :: Name,
+                     pastTravel :: PastTravel,
+                     futureTravel ::FutureTravel,
+                     price :: Price }
                  deriving Show
 
 clientName :: Client -> String
 clientName client = case client of
-                      GovOrg name -> name
-                      Company name _ _ _-> name
+                      GovOrg n -> n
+                      Company n _ _ _-> n
                       Individual (Person fN lN _) _ -> fN ++ " " ++ lN
 
 companyName :: Client -> Maybe String
 companyName client = case client of
-                       Company name _ _ _ -> Just name
+                       Company n _ _ _ -> Just n
                        _ -> Nothing
 
 countGenders :: [Person] -> (Integer, Integer)
@@ -57,7 +59,28 @@ countGenders (p : ps) = let (mC, fC) = countGenders ps
 applyDiscount :: Double -> [TimeMachine] -> [TimeMachine]
 applyDiscount _ [] = []
 applyDiscount d (tm : tms) =
-  let (TimeMachine man model name p f (Price pr)) = tm
+  let TimeMachine { price = (Price pr) } = tm
       disc = d * pr / 100
       newP = Price (pr - disc)
-  in (TimeMachine man model name p f newP) : (applyDiscount d tms)
+  in tm { price = newP } : (applyDiscount d tms)
+
+responsibility :: Client -> String
+responsibility (Company _ _ _ r) = r
+responsibility _ = "Unknown"
+
+specialClient :: Client -> Bool
+specialClient (clientName -> "Mr Aljandro") = True
+specialClient (responsibility -> "Director") = True
+specialClient _ = False
+
+data ClientR = GovOrgR { clientRName :: String}
+             | CompanyR { clientRName :: String,
+                          companyId :: Integer,
+                          person :: PersonR,
+                          duty :: String }
+             | IndividualR { person :: PersonR }
+             deriving Show
+
+data PersonR = PersonR { firstName :: String,
+                         lastName :: String }
+             deriving Show

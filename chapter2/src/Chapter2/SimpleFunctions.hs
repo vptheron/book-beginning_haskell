@@ -36,3 +36,29 @@ maxmin2 lst = let h = head lst
                  ) where t = maxmin (tail lst)
                          t_max = fst t
                          t_min = snd t
+
+ifibonacci :: Integer -> Maybe Integer
+ifibonacci n | n < 0     = Nothing
+ifibonacci 0             = Just 0
+ifibonacci 1             = Just 1
+ifibonacci n | otherwise =
+  let Just f1 = ifibonacci (n - 1)
+      Just f2 = ifibonacci (n - 2)
+  in Just (f1 + f2)
+
+binom :: Integer -> Integer -> Integer
+binom _ 0          = 1
+binom x y | x == y = 1
+binom n k          =
+  (binom (n - 1) (k - 1)) + (binom (n - 1) k)
+
+ackermann :: Integer -> Integer -> Integer
+ackermann 0 n = n + 1
+ackermann m 0 | m > 0 = ackermann (m - 1) 1
+ackermann m n = ackermann (m - 1) (ackermann m (n - 1))
+
+unzip2 :: [(a,b)] -> ([a],[b])
+unzip2 [] = ([],[])
+unzip2 ((x,y) : xys) =
+  let (xs,ys) = unzip(xys)
+  in (x : xs, y : ys)
