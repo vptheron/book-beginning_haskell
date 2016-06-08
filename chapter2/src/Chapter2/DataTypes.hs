@@ -1,6 +1,6 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module DataTypes where
+module Chapter2.DataTypes where
 
 data Person = Person String String Gender
               deriving Show
